@@ -2,15 +2,14 @@ package gotun2socks
 
 import (
 	"fmt"
-	"log"
 	"net"
 	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
 
+	"github.com/txthinking/gotun2socks/internal/packet"
 	"github.com/yinghuocho/gosocks"
-	"github.com/yinghuocho/gotun2socks/internal/packet"
 )
 
 type tcpPacket struct {
@@ -402,7 +401,7 @@ func (tt *tcpConnTrack) stateClosed(syn *tcpPacket) (continu bool, release bool)
 	for i := 0; i < 2; i++ {
 		tt.socksConn, e = dialLocalSocks(tt.localSocksAddr)
 		if e != nil {
-			log.Printf("fail to connect SOCKS proxy: %s", e)
+			//log.Printf("fail to connect SOCKS proxy: %s", e)
 		} else {
 			// no timeout
 			tt.socksConn.SetDeadline(time.Time{})
@@ -432,20 +431,20 @@ func (tt *tcpConnTrack) tcpSocks2Tun(dstIP net.IP, dstPort uint16, conn net.Conn
 		DstPort:  dstPort,
 	})
 	if e != nil {
-		log.Printf("error to send socks request: %s", e)
+		//log.Printf("error to send socks request: %s", e)
 		conn.Close()
 		close(closeCh)
 		return
 	}
 	reply, e := gosocks.ReadSocksReply(conn)
 	if e != nil {
-		log.Printf("error to read socks reply: %s", e)
+		//log.Printf("error to read socks reply: %s", e)
 		conn.Close()
 		close(closeCh)
 		return
 	}
 	if reply.Rep != gosocks.SocksSucceeded {
-		log.Printf("socks connect request fail, retcode: %d", reply.Rep)
+		//log.Printf("socks connect request fail, retcode: %d", reply.Rep)
 		conn.Close()
 		close(closeCh)
 		return
@@ -499,7 +498,7 @@ func (tt *tcpConnTrack) tcpSocks2Tun(dstIP net.IP, dstPort uint16, conn net.Conn
 
 		n, e := conn.Read(buf[:cur])
 		if e != nil {
-			log.Printf("error to read from socks: %s", e)
+			//log.Printf("error to read from socks: %s", e)
 			conn.Close()
 			break
 		} else {
@@ -754,7 +753,7 @@ func (tt *tcpConnTrack) run() {
 
 		case <-tt.quitByOther:
 			// who closes this channel should be responsible to clear track map
-			log.Printf("tcpConnTrack quitByOther")
+			//log.Printf("tcpConnTrack quitByOther")
 			if tt.socksConn != nil {
 				tt.socksConn.Close()
 			}
@@ -798,7 +797,7 @@ func (t2s *Tun2Socks) createTCPConnTrack(id string, ip *packet.IPv4, tcp *packet
 
 	t2s.tcpConnTrackMap[id] = track
 	go track.run()
-	log.Printf("tracking %d TCP connections", len(t2s.tcpConnTrackMap))
+	//log.Printf("tracking %d TCP connections", len(t2s.tcpConnTrackMap))
 	return track
 }
 
@@ -814,7 +813,7 @@ func (t2s *Tun2Socks) clearTCPConnTrack(id string) {
 	defer t2s.tcpConnTrackLock.Unlock()
 
 	delete(t2s.tcpConnTrackMap, id)
-	log.Printf("tracking %d TCP connections", len(t2s.tcpConnTrackMap))
+	//log.Printf("tracking %d TCP connections", len(t2s.tcpConnTrackMap))
 }
 
 func (t2s *Tun2Socks) tcp(raw []byte, ip *packet.IPv4, tcp *packet.TCP) {

@@ -2,13 +2,12 @@ package gotun2socks
 
 import (
 	"io"
-	"log"
 	"net"
 	"sync"
 	"time"
 
+	"github.com/txthinking/gotun2socks/internal/packet"
 	"github.com/yinghuocho/gosocks"
-	"github.com/yinghuocho/gotun2socks/internal/packet"
 )
 
 const (
@@ -114,7 +113,7 @@ func (t2s *Tun2Socks) Run() {
 					releaseIPPacket(ip)
 				}
 			case <-t2s.writerStopCh:
-				log.Printf("quit tun2socks writer")
+				//log.Printf("quit tun2socks writer")
 				return
 			}
 		}
@@ -132,13 +131,13 @@ func (t2s *Tun2Socks) Run() {
 		n, e := t2s.dev.Read(buf[:])
 		if e != nil {
 			// TODO: stop at critical error
-			log.Printf("read packet error: %s", e)
+			//log.Printf("read packet error: %s", e)
 			return
 		}
 		data := buf[:n]
 		e = packet.ParseIPv4(data, &ip)
 		if e != nil {
-			log.Printf("error to parse IPv4: %s", e)
+			//log.Printf("error to parse IPv4: %s", e)
 			continue
 		}
 		if t2s.publicOnly {
@@ -164,7 +163,7 @@ func (t2s *Tun2Socks) Run() {
 		case packet.IPProtocolTCP:
 			e = packet.ParseTCP(ip.Payload, &tcp)
 			if e != nil {
-				log.Printf("error to parse TCP: %s", e)
+				//log.Printf("error to parse TCP: %s", e)
 				continue
 			}
 			t2s.tcp(data, &ip, &tcp)
@@ -172,14 +171,14 @@ func (t2s *Tun2Socks) Run() {
 		case packet.IPProtocolUDP:
 			e = packet.ParseUDP(ip.Payload, &udp)
 			if e != nil {
-				log.Printf("error to parse UDP: %s", e)
+				//log.Printf("error to parse UDP: %s", e)
 				continue
 			}
 			t2s.udp(data, &ip, &udp)
 
 		default:
 			// Unsupported packets
-			log.Printf("Unsupported packet: protocol %d", ip.Protocol)
+			//log.Printf("Unsupported packet: protocol %d", ip.Protocol)
 		}
 	}
 }
