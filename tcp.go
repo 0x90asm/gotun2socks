@@ -8,8 +8,8 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/txthinking/gotun2socks/gosocks"
 	"github.com/txthinking/gotun2socks/internal/packet"
-	"github.com/yinghuocho/gosocks"
 )
 
 type tcpPacket struct {
