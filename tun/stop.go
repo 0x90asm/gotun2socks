@@ -2,6 +2,7 @@ package tun
 
 import (
 	"bytes"
+	"log"
 	"net"
 )
 
@@ -15,7 +16,7 @@ func sendStopMarker(src, dst string) {
 	r, _ := net.ResolveUDPAddr("udp", dst+":2222")
 	conn, err := net.DialUDP("udp", l, r)
 	if err != nil {
-		//log.Printf("fail to send stopmarker: %s", err)
+		log.Printf("fail to send stopmarker: %s", err)
 		return
 	}
 	defer conn.Close()

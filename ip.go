@@ -1,9 +1,10 @@
 package gotun2socks
 
 import (
+	"log"
 	"net"
 
-	"github.com/txthinking/gotun2socks/internal/packet"
+	"github.com/0x90asm/gotun2socks/internal/packet"
 )
 
 type ipPacket struct {
@@ -23,7 +24,7 @@ func procFragment(ip *packet.IPv4, raw []byte) (bool, *packet.IPv4, []byte) {
 			return false, nil, nil
 		}
 		// first
-		//log.Printf("first fragment of IPID %d", ip.Id)
+		log.Printf("first fragment of IPID %d", ip.Id)
 		dup := make([]byte, len(raw))
 		copy(dup, raw)
 		clone := &packet.IPv4{}
@@ -39,10 +40,10 @@ func procFragment(ip *packet.IPv4, raw []byte) (bool, *packet.IPv4, []byte) {
 
 		last := false
 		if ip.Flags&0x1 == 0 {
-			//log.Printf("last fragment of IPID %d", ip.Id)
+			log.Printf("last fragment of IPID %d", ip.Id)
 			last = true
 		} else {
-			//log.Printf("continue fragment of IPID %d", ip.Id)
+			log.Printf("continue fragment of IPID %d", ip.Id)
 		}
 
 		return last, exist.ip, exist.wire

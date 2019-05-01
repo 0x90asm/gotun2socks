@@ -30,7 +30,7 @@ func OpenTunDevice(name, addr, gw, mask string, dns []string) (io.ReadWriteClose
 	var req ifReq
 	copy(req.Name[:], name)
 	req.Flags = IFF_TUN | IFF_NO_PI
-	//log.Printf("openning tun device")
+	log.Printf("openning tun device")
 	_, _, errno := syscall.Syscall(syscall.SYS_IOCTL, file.Fd(), uintptr(syscall.TUNSETIFF), uintptr(unsafe.Pointer(&req)))
 	if errno != 0 {
 		err = errno
@@ -38,26 +38,26 @@ func OpenTunDevice(name, addr, gw, mask string, dns []string) (io.ReadWriteClose
 	}
 
 	// config address
-	//log.Printf("configuring tun device address")
+	log.Printf("configuring tun device address")
 	cmd := exec.Command("ip", "link", "set", name, "up")
 	err = cmd.Run()
 	if err != nil {
 		file.Close()
-		//log.Printf("failed to configure tun device address")
+		log.Printf("failed to configure tun device address")
 		return nil, err
 	}
 	cmd = exec.Command("ip", "link", "set", name, "mtu", "1500")
 	err = cmd.Run()
 	if err != nil {
 		file.Close()
-		//log.Printf("failed to configure tun device address")
+		log.Printf("failed to configure tun device address")
 		return nil, err
 	}
 	cmd = exec.Command("ip", "addr", "add", addr+"/"+mask, "dev", name)
 	err = cmd.Run()
 	if err != nil {
 		file.Close()
-		//log.Printf("failed to configure tun device address")
+		log.Printf("failed to configure tun device address")
 		return nil, err
 	}
 	syscall.SetNonblock(int(file.Fd()), false)
@@ -104,7 +104,7 @@ func (dev *tunDev) Write(data []byte) (int, error) {
 }
 
 func (dev *tunDev) Close() error {
-	//log.Printf("send stop marker")
+	log.Printf("send stop marker")
 	sendStopMarker(dev.addr, dev.gw)
 	return dev.f.Close()
 }
