@@ -3,6 +3,7 @@ package tun
 import (
 	"errors"
 	"io"
+	"log"
 	"net"
 	"os"
 	"os/exec"
